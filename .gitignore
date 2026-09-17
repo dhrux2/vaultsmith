@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env*.local
+
+# Original font source archives (not needed at build time; app/fonts/*.otf are used instead)
+/Anthropic Sans-fontiko/
+/Anthropic Serif-fontiko/
+/vaultsmith_logo.png
+
+# Local tooling config, not part of the app
+/.claude/
+CLAUDE.md
+AGENTS.md
