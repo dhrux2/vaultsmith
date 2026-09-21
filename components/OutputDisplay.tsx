@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { liquid } from "./Controls";
 import { CheckIcon, CopyIcon, RefreshIcon } from "./Icons";
+import SaveCredential from "./SaveCredential";
 
 const GLYPHS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%&*?";
 
@@ -161,6 +162,8 @@ export default function OutputDisplay({
             </motion.span>
           </AnimatePresence>
         </motion.button>
+
+        <SaveCredential password={value} />
       </div>
     </div>
   );
