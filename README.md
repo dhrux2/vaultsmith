@@ -1,73 +1,95 @@
+<div align="center">
+
+<img src="public/vaultsmith-logo.png" alt="Vaultsmith" width="88">
+
 # Vaultsmith
 
-A password and passphrase generator that does the math honestly instead of
-just showing a progress bar. Every number on screen — entropy, crack time,
-pattern penalties — is computed from the actual generation logic, not
-guessed.
+Passwords, passphrases, and a closer look at their strength.
 
-Built with Next.js, TypeScript, and Framer Motion.
+[Open Vaultsmith](https://vaultsmith.vercel.app) · [Run locally](#run-locally) · [How it works](#how-it-works)
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-161b22?style=flat-square&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-161b22?style=flat-square&logo=typescript&logoColor=white)
+![Web Crypto](https://img.shields.io/badge/Web_Crypto-161b22?style=flat-square)
+[![MIT license](https://img.shields.io/badge/License-MIT-161b22?style=flat-square)](LICENSE)
 
-- **Password generator** — adjustable length (4–64), toggleable character
-  sets, and an option to exclude visually ambiguous characters (`0 O o 1 l I |`).
-- **Passphrase generator** — configurable word count, separator, and
-  capitalization style, drawn from a curated wordlist.
-- **Real entropy math, not an estimate.** Password entropy accounts for the
-  "each selected character set must appear at least once" constraint using
-  inclusion–exclusion, so the bits shown are the exact log₂ of the number of
-  strings the generator can actually produce — not `length × log2(poolSize)`.
-- **Strength inspector** — paste in any password and see a pattern-aware
-  score (dictionary words, leetspeak substitutions, keyboard walks,
-  sequences, years, common-password lists) alongside the naive
-  length-times-pool-size number, so you can see exactly how much the naive
-  formula overestimates real-world passwords.
-- **Crack-time estimates** across four attack scenarios (rate-limited login,
-  offline slow hash, GPU cluster, nation-state), computed in log space so it
-  doesn't overflow on high-entropy inputs.
-- **Session-only history** — recently generated/copied values are kept in
-  memory for the session and blurred until hovered; nothing is persisted or
-  sent anywhere.
-- Light/dark theme that follows the OS setting live, with a matching favicon
-  swap.
-- No network requests, no analytics, no storage. Generation uses
-  `crypto.getRandomValues` with rejection sampling to avoid modulo bias.
+</div>
 
-## Getting started
+---
+
+Vaultsmith generates passwords and memorable passphrases in the browser. Adjust the options, see how they change the available combinations, and copy a result when you're ready. A separate inspector checks existing passwords for common patterns and compares its estimate with a simple character-pool calculation.
+
+## What you can do
+
+- **Generate passwords:** choose 4–64 characters, enable lowercase letters, uppercase letters, numbers, or symbols, and exclude lookalike characters.
+- **Build passphrases:** combine 3–10 words with a choice of separator, capitalization, and an optional number.
+- **Inspect a password:** check for dictionary words, common passwords, keyboard walks, sequences, years, and leetspeak substitutions.
+- **Compare attack scenarios:** switch between the app's four assumed guessing rates to see how the displayed crack-time estimate changes.
+- **Revisit recent results:** keep up to eight entries in session memory, copy them again, or clear the list.
+- **Choose a theme:** use light or dark mode, or follow the device preference.
+- **Save through the browser:** request credential storage using the Save button in browsers that support the Credential Management API.
+
+### Keyboard shortcuts
+
+| Key | Action |
+| --- | --- |
+| `G` | Generate another password or passphrase |
+| `C` | Copy the current result |
+
+Shortcuts work in the Forge view when focus is outside a text field.
+
+## How it works
+
+The generation code and the strength calculations live separately from the interface. Random choices use `crypto.getRandomValues`; rejection sampling avoids the bias introduced by taking a random integer modulo the pool size.
+
+Password generation also rejects results that omit a selected character group, when the requested length allows every group to appear. The entropy calculation uses inclusion–exclusion to count those valid combinations. Passphrase entropy is calculated from the bundled wordlist and the selected options.
+
+The inspector takes a different approach: it reduces its estimate when it finds recognizable patterns. That makes it a heuristic for arbitrary input. Crack times use fixed guessing-rate assumptions; they are comparisons within the model, not measured predictions.
+
+## Privacy and storage
+
+Generation and inspection run locally, with no application backend or database. Password history stays in React state and disappears on reload. The theme preference is saved in local storage. Copying a result writes it to the system clipboard. The optional Save action hands the credential to the browser's credential manager; storage and any sync then follow that browser's settings.
+
+## Built with
+
+Next.js 16, React 19, and TypeScript, with Framer Motion for interface transitions and GSAP for the background layer. Fonts are served locally through `next/font/local`.
+
+## Run locally
+
+Install Node.js 22 LTS and npm, then:
 
 ```bash
-npm install
+git clone https://github.com/dhrux2/vaultsmith.git
+cd vaultsmith
+npm ci
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [localhost:3000](http://localhost:3000). No environment variables or external services are required.
+
+For a production build:
 
 ```bash
-npm run build   # production build
-npm run start   # serve the production build
+npm run build
+npm run start
 ```
 
-## Tech stack
+## Code map
 
-- [Next.js](https://nextjs.org/) (App Router) + TypeScript
-- [Framer Motion](https://www.framer.com/motion/) for UI motion
-- [GSAP](https://gsap.com/) for the background layer
-- Self-hosted variable fonts via `next/font/local`
-- No backend, no database — everything runs client-side
+| Location | Responsibility |
+| --- | --- |
+| `app/` | Page shell, global styles, metadata, and local fonts |
+| `components/Vaultsmith.tsx` | Generator controls, shortcuts, and session state |
+| `components/Tester.tsx` | Password inspection interface |
+| `lib/generator.ts` | Password and passphrase generation |
+| `lib/random.ts` | Random selection helpers |
+| `lib/entropy.ts` | Entropy calculations and attack scenarios |
+| `lib/analyze.ts` | Pattern detection and strength estimates |
 
-## Project structure
+## Further work
 
-```
-app/                Next.js app router pages, global styles, fonts
-components/          UI components (generator, inspector, controls, theme)
-lib/
-  generator.ts       Password/passphrase generation (CSPRNG-backed)
-  entropy.ts          Entropy math, crack-time estimation, strength tiers
-  analyze.ts           Pattern-aware password strength analysis
-  random.ts             Unbiased random helpers over crypto.getRandomValues
-  wordlist.ts             Passphrase wordlist
-```
+Automated coverage for the generator constraints and entropy calculations would make changes easier to verify. The inspector could also benefit from a broader dictionary and comparisons against established password-strength estimators. There is no automated test script in the current package.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE). Built by [Dhruv Upadhyay](https://dhruvupadhyay.com).
