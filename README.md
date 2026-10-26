@@ -78,6 +78,13 @@ For a production build:
 npm run build
 npm run start
 ```
+### Available commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server with live updates |
+| `npm run build` | Create an optimized production build |
+| `npm run start` | Serve the production build; run `npm run build` first |
 
 ## Code map
 
